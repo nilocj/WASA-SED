@@ -29,7 +29,7 @@ character(100) :: dummy_char
 !Ge include j,nbrbat1,cont,upstream,downstream
 INTEGER :: j,nbrbat1,flag_cav
 REAL :: elevhelp,evaphelp2,volhelp !,elevhelp2,elevhelp3
-REAL :: help,help1,help2,help3,evaphelp,areahelp,helpout,prechelp !,helpin,infhelp
+REAL :: help,help1,help2,help3,evaphelp,areahelp,helpout,prechelp, vol_diff, area_diff !,helpin,infhelp
 !Ge actual storage capacity of large river reservoir in a certain year[10**6 m**3]
 !REAL :: storcapact
 
@@ -179,7 +179,7 @@ storcap(:)=0.
 	  READ (fmtstr,*,IOSTAT=istate) dummy1, minlevel(i), maxlevel(i),vol0(i),storcap(i), &
 			damflow(i),damq_frac(i),withdrawal(i),damyear(i),maxdamarea(i), &
 			damdead(i),damalert(i),dama(i),damb(i),qoutlet(i),fvol_bottom(i), &
-			fvol_over(i),damc(i),damd(i),elevbottom(i)
+			flag__over_delay(i),damc(i),damd(i),elevbottom(i)
 
       
 	  IF (istate/=0) THEN
@@ -206,8 +206,9 @@ storcap(:)=0.
       if(fvol_bottom(i) > 1. .or. (fvol_bottom(i) < 0. .and. fvol_bottom(i) > -998.)) then
         write(*,'(A,i3,A)') 'WARNING: Parameter fvol_bottom in reservoir.dat is outside of plausible range (0 <= fvol_bottom <= 1 or eq. -999) for reservoir / subbasin id ', id_subbas_extern(i), '! During calibration this might make sense.'
 	  end if
-      if(fvol_over(i) > 1. .or. fvol_over(i) < 0.) then
-        write(*,'(A,i3,A)') 'WARNING: Parameter fvol_over in reservoir.dat is outside of plausible range (0 <= fvol_over <= 1) for reservoir / subbasin id ', id_subbas_extern(i), '! During calibration this might make sense.'
+      if(flag__over_delay(i) /= 1 .and. flag__over_delay(i) /= 0) then
+        write(*,'(A,i3,A)') 'ERROR: Parameter flag__over_delay in reservoir.dat for reservoir / subbasin id ', id_subbas_extern(i), ' must be 0 or 1.'
+		stop
 	  end if
       if(damalert(i) < damdead(i)) then
         write(*,'(A,i3,A)') 'ERROR: Parameter damalert in reservoir.dat is less than damdead for reservoir / subbasin id ', id_subbas_extern(i), '!'
@@ -954,12 +955,17 @@ IF (STATUS == 1) THEN !beginning of a new simulation year
      nbrbat1=nbrbat(res_index(i))
      IF (nbrbat(res_index(i)) /= 0) THEN
       DO j=1,nbrbat(res_index(i))-1
-        IF (volact(1,i)*1.e6 >= vol_bat(j,i).AND.  &
-            volact(1,i)*1.e6 <= vol_bat(j+1,i)) THEN
-          damareaact(i)=area_bat(j,i)+((volact(1,i)*1.e6)-vol_bat  &
-                (j,i))/(vol_bat(j+1,i)-vol_bat(j,i))*  &
-                (area_bat(j+1,i)-area_bat(j,i))
-	    ENDIF
+        vol_diff = vol_bat(j+1,i)-vol_bat(j,i)
+        if (vol_diff==0) then
+            damareaact(i)=area_bat(j,i) !Till: no volume change = no area change (added to catch division by 0.)
+        else
+            area_diff = area_bat(j+1,i)-area_bat(j,i)
+            IF (volact(1,i)*1.e6 >= vol_bat(j,i).AND.  &
+                volact(1,i)*1.e6 <= vol_bat(j+1,i)) THEN
+              damareaact(i)=area_bat(j,i)+((volact(1,i)*1.e6)- &
+                            vol_bat(j,i))/vol_diff * area_diff
+            ENDIF
+	    end if
 	  ENDDO
      ELSE
 	  if (volact(1,i) /= 0.) then
@@ -1198,8 +1204,8 @@ IF (STATUS == 2) THEN !regular call during timestep
 !write(*,'(2I4,4F15.4)')step,id_subbas_extern(upstream),help3,volact(step,upstream),daystorcap(step,upstream),overflow(step,upstream)
       IF (help3 > daystorcap(step,res_index(upstream))) THEN
 !write(*,'(2I4,4F15.4)')step,id_subbas_extern(upstream),volact(step,upstream),help3,help,daystorcap(step,upstream)
-!write(*,'(2I4,4F15.4)')step,id_subbas_extern(upstream),fvol_over(upstream)*daystorcap(step,upstream),help3,daystorcap(step,upstream)
-		IF (fvol_over(upstream)==1) THEN
+!write(*,'(2I4,4F15.4)')step,id_subbas_extern(upstream),flag__over_delay(upstream)*daystorcap(step,upstream),help3,daystorcap(step,upstream)
+		IF (flag__over_delay(upstream)==1) THEN
           help=daystorcap(step,res_index(upstream))
 !write(*,'(2I4,3F15.4)')step,id_subbas_extern(upstream),overflow(step,upstream)/86400.
 !write(*,'(2I4,4F15.4)')step,id_subbas_extern(upstream),volact(step,upstream),help3,help,daystorcap(step,upstream)
@@ -1215,7 +1221,7 @@ IF (STATUS == 2) THEN !regular call during timestep
       END IF
 !write(*,'(2I4,4F15.4)')step,id_subbas_extern(upstream),help,volact(step,upstream),daystorcap(step,upstream),overflow(step,upstream)
 !if (d==31)stop
-!write(*,'(2I4,4F15.3)')d,id_subbas_extern(upstream),fvol_over(upstream),daystorcap(step,upstream),volact(step,upstream)+qinflow(step,upstream),overflow(step,upstream)
+!write(*,'(2I4,4F15.3)')d,id_subbas_extern(upstream),flag__over_delay(upstream),daystorcap(step,upstream),volact(step,upstream)+qinflow(step,upstream),overflow(step,upstream)
 !write(*,'(2I4,4F15.3)')d,id_subbas_extern(upstream),volact(step,upstream)
 
 !write(*,'(2I4,4F15.4)')step,id_subbas_extern(upstream),volact(step,upstream),help3,help,daystorcap(step,upstream)
@@ -1224,15 +1230,19 @@ IF (STATUS == 2) THEN !regular call during timestep
 ! Calculation of the actual reservoir area by interpolation (using the stage-area-volume curve)
       IF (nbrbat(res_index(upstream)) /= 0) THEN
         DO j=1,nbrbat(res_index(upstream))-1
-          IF (volact(step,upstream) >= vol_bat(j,upstream).AND.  &
-                volact(step,upstream) <= vol_bat(j+1,upstream)) THEN
-            areahelp=area_bat(j,upstream)+(volact(step,upstream)-vol_bat  &
-                (j,upstream))/(vol_bat(j+1,upstream)-vol_bat(j,upstream))*  &
-                (area_bat(j+1,upstream)-area_bat(j,upstream))
-            elevhelp=elev_bat(j,upstream)+(volact(step,upstream)-vol_bat  &
-                (j,upstream))/(vol_bat(j+1,upstream)-vol_bat(j,upstream))*  &
-                (elev_bat(j+1,upstream)-elev_bat(j,upstream))
-          END IF
+          vol_diff = vol_bat(j+1,upstream)-vol_bat(j,upstream)
+          if (vol_diff==0) then
+              areahelp=area_bat(j,upstream) !Till: no volume change = no area change (added to catch division by 0.)
+              elevhelp=elev_bat(j,upstream)
+          else
+              IF (volact(step,upstream) >= vol_bat(j,upstream).AND.  &
+                    volact(step,upstream) <= vol_bat(j+1,upstream)) THEN
+                areahelp=area_bat(j,upstream)+(volact(step,upstream)-vol_bat(j,upstream))/ vol_diff*  &
+                    (area_bat(j+1,upstream)-area_bat(j,upstream))
+                elevhelp=elev_bat(j,upstream)+(volact(step,upstream)-vol_bat(j,upstream))/ vol_diff*  &
+                    (elev_bat(j+1,upstream)-elev_bat(j,upstream))
+              END IF
+           end if
         END DO
 ! Calculation of the actual reservoir area by interpolation (using the morphologic parameter alpha)
       ELSE
@@ -1442,7 +1452,7 @@ IF (STATUS == 2) THEN !regular call during timestep
 
 
 ! 5) Calculation of the overflow discharges from the reservoir
-      IF (help3 > daystorcap(step,res_index(upstream)) .and. fvol_over(upstream) == 1) THEN
+      IF (help3 > daystorcap(step,res_index(upstream)) .and. flag__over_delay(upstream) == 1) THEN
         ! volume in/decrease relative to storage capacity after all other water balance components were added
         help=(volact(step,upstream)-daystorcap(step,res_index(upstream)))+qinflow(step,res_index(upstream))
         ! total volume after all other water balance components were added
@@ -1483,12 +1493,16 @@ IF (STATUS == 2) THEN !regular call during timestep
         DO j=1,nbrbat(res_index(upstream))-1
           IF (volact(step,upstream) >= vol_bat(j,upstream).AND.  &
                 volact(step,upstream) <= vol_bat(j+1,upstream)) THEN
-            areahelp=area_bat(j,upstream)+(volact(step,upstream)-vol_bat  &
-                (j,upstream))/(vol_bat(j+1,upstream)-vol_bat(j,upstream))*  &
-                (area_bat(j+1,upstream)-area_bat(j,upstream))
-            elevhelp=elev_bat(j,upstream)+(volact(step,upstream)-vol_bat  &
-                (j,upstream))/(vol_bat(j+1,upstream)-vol_bat(j,upstream))*  &
-                (elev_bat(j+1,upstream)-elev_bat(j,upstream))
+            vol_diff = vol_bat(j+1,upstream)-vol_bat(j,upstream)
+            if (vol_diff==0) then
+              areahelp=area_bat(j,upstream) !Till: no volume change = no area change (added to catch division by 0.)
+              elevhelp=elev_bat(j,upstream)
+            else
+                areahelp=area_bat(j,upstream)+(volact(step,upstream)-vol_bat(j,upstream))/vol_diff* &
+                    (area_bat(j+1,upstream)-area_bat(j,upstream))
+                elevhelp=elev_bat(j,upstream)+(volact(step,upstream)-vol_bat(j,upstream))/vol_diff* &
+                    (elev_bat(j+1,upstream)-elev_bat(j,upstream))
+             end if
           END IF
         END DO
       ELSE

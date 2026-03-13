@@ -1,16 +1,16 @@
-# WASA-SED
+# WASA-SED - <ins>W</ins>ater <ins>A</ins>vailability and <ins>S</ins>ediment <ins>A</ins>nalysis – <ins>Se</ins>mi- <ins>d</ins>istributed model
 
 # User Manual
 main contributors:
 Andreas Güntner (2000-2002), Eva Nora Müller (2006-2009), George Mamede(2006-2009), Till Francke (2006-...), Pedro Medeiros (2007-2008), Tobias Pilz (2016), Erwin Rottler (2017)
 
-**30.6.2021<br>
-WASA-SED rev_269**
+**28.1.2025<br>
+WASA-SED rev_281**
 
 Developed within the SESAM-Project:<br>
 Sediment Export of Semi-Arid Catchment: Monitoring and Modelling 2005-2008<br>
 SESAM II 2010-2014,<br>
-2015-2022
+2015-2025
 
 Institute of Environmental Sciences and Geography, University of Potsdam, Potsdam,<br>
 Deutsches Geoforschungszentrum Potsdam,<br>
@@ -68,7 +68,7 @@ The WASA-SED program is large and complex and extensive knowledge of its design,
 
 
 ## List of figures
-[Figure 1](#figure-1): WASA parameter specification file ```do.dat```.<br>
+[Figure 1](#figure-1): WASA-SED parameter specification file ```do.dat```.<br>
 [Figure 2](#figure-2): Trapezoidal channel dimension with floodplains.
 
 ## List of tables
@@ -78,9 +78,9 @@ The WASA-SED program is large and complex and extensive knowledge of its design,
 [Table 4](#table-4): Summary of model input parameters.<br>
 [Table 5](#table-5): Keywords and descriptions optional outfiles related to the snow routine.<br>
 [Table 6](#table-6): Input data files for the hillslope component.<br>
-[Table 7](#table-7): Groundwater option Gw_flag=0.<br>
-[Table 8](#table-8): Groundwater option Gw_flag=1.<br>
-[Table 9](#table-9): Groundwater option Gw_flag=99.<br>
+[Table 7](#table-7): Groundwater option gw_flag=0.<br>
+[Table 8](#table-8): Groundwater option gw_flag=1.<br>
+[Table 9](#table-9): Groundwater option gw_flag=99.<br>
 [Table 10](#table-10): Input data files for the river component.<br>
 [Table 11](#table-11): Input data files for the reservoir component.<br>
 [Table 12](#table-12): Input/Output of state variables.<br>
@@ -90,7 +90,9 @@ The WASA-SED program is large and complex and extensive knowledge of its design,
 
 ## 1 Introduction
 
-The WASA-SED model simulates the runoff and erosion processes at the hillslope scale, the transport processes of suspended and bedload fluxes at the river scale and the retention and remobilisation processes of sediments in large reservoirs. The modelling tool enables the evaluation of management options both for sustainable land-use change scenarios to reduce erosion in the headwater catchments as well as adequate reservoir management options to lessen sedimentation in large reservoirs and reservoir networks. The model concept, its spatial discretisation and the numerical components of the hillslope, river and reservoir processes are summarised and current model applications are reviewed in [Mueller et al. (2010)](#mueller-et-al-2010). The hydrological routines of the model are based on the WASA model (Model for Water Availability in Semi-Arid environments), which was developed by [Güntner (2002)](#guentner-2002) and [Güntner and Bronstert (2002,](#guentner-bronstert-2002) [2003)](#guentner-bronstert-2003) to enable the quantification of water availability in semi-arid regions. The WASA-SED model was developed within the joint Spanish-Brazilian-German research project SESAM (Sediment Export from Semi-Arid Catchments: Measurement and Modelling). The existing WASA model code has been extended to include sediment-transport routines for the three new conceptual levels of the WASA-SED model: the hillslope scale, river scale and the reservoir scale for the calculation of sedimentation. This documentation gives a short outline of the structure, computational routines and folder system of the WASA-SED code in [Chapter 2](#program-folders-and-structure), followed by a description of the input files for model parameterisation in [Chapter 3](#input-data) and output files for the hillslope, river and reservoir modules in [Chapter 4](#output-data).
+The hydro-sedimentological model WASA-SED simulates the runoff and erosion processes at the hillslope scale, the transport processes of suspended and bedload fluxes at the river scale and the retention and remobilisation processes of sediments in large reservoirs. The modelling tool enables the evaluation of management options both for sustainable land-use change scenarios to reduce erosion in the headwater catchments as well as adequate reservoir management options to lessen sedimentation in large reservoirs and reservoir networks. The model concept, its spatial discretisation and the numerical components of the hillslope, river and reservoir processes are summarised and current model applications are reviewed in [Mueller et al. (2010)](#mueller-et-al-2010). The hydrological routines of the model are based on the WASA model (Model for Water Availability in Semi-Arid environments), which was developed by [Güntner (2002)](#guentner-2002) and [Güntner and Bronstert (2002,](#guentner-bronstert-2002) [2003)](#guentner-bronstert-2003) to enable the quantification of water availability in semi-arid regions. The WASA-SED model was developed within the joint Spanish-Brazilian-German research project SESAM (Sediment Export from Semi-Arid Catchments: Measurement and Modelling). The existing WASA model code has been extended to include sediment-transport routines for the three new conceptual levels of the WASA-SED model: the hillslope scale, river scale and the reservoir scale for the calculation of sedimentation. The original acronym was recoinded to <ins>W</ins>ater <ins>A</ins>vailability and <ins>S</ins>ediment <ins>A</ins>nalysis – <ins>Se</ins>mi- <ins>d</ins>istributed model.
+
+This documentation gives a short outline of the structure, computational routines and folder system of the WASA-SED code in [Chapter 2](#program-folders-and-structure), followed by a description of the input files for model parameterisation in [Chapter 3](#input-data) and output files for the hillslope, river and reservoir modules in [Chapter 4](#output-data).
 
 \[[Table of contents](#toc)]
 ## 2 Program folders and structure
@@ -281,7 +283,7 @@ Four parameter files control the data input and output and some internal setting
 ```do.dat``` <br>
 \[can be generated with the lumpR package, manual adjustments required]
 
-The file ```do.dat``` contains the main parameter specifications for the WASA-SED model. By default, it is located in the folder WASA\Input, but any other location may be specified as a command line argument (e.g. ```wasa.exe my_own/do.dat```).  [Figure 1](#figure-1) displays an example. Line order is important; do not add nor delete any lines. The first line of the ```do.dat``` contains the title. Line 2 and 3 specify the path for the location of WASA input and output folder. Relative paths are supported. The backslash “\” only works on Windows-platforms. The slash “/” is accepted on Windows and Unix/Linux systems. Make sure that both specified paths end with slash or backslash, respectively. Line 4 and 5 contain the start and the end year of the simulation, respectively. Line 6 and 7 contain the start and the end calendar month of the simulation, respectively. Optionally, the day of month for begin and end can be specified separated by a blank space. Line 10 contains the number of sub-basins. The number in line 9 is given by the sum of the number of terrain components in each landscape-unit of each sub-basin (e.g. if the system has only two sub-basins, sub-basin A has 1 landscape unit with 3 terrain components, sub-basin B has 2 landscape units with 1 terrain component each, then the number of combinations is 5). Line 14 specifies if the reservoir module is switched on (.t.) or is switched off (.f.). The same issue for the calculations of networks of small reservoirs in line 15. Lines 16 – 19 allow customizing the way water and sediment is (re-)distributed within and among the TCs. Line 21 allows the setting of the simulation timestep (daily / hourly). This may become obsolete in future versions by setting the timestep directly in line 30. Line 24 allows specifying a correction factor for hydraulic conductivity to account for intra-daily rainfall intensities. Optionally, this factor can also be made a function of daily rainfall by specifying two more parameters (a and b) in the same line, so that kfkorr=kfkorr0\*(a\*1/daily_precip+b+1). In line 31 the erosion and sediment-transport routines may be switched on and off. Specify the number of grain size classes you want to model in line 32. Their limits must be specified in ```part_class.dat```, if more than one class is desired. Line 33 lets you choose the hillslope erosion model to be used in WASA. Currently, this parameter is disregarded, further options can be chosen in ```erosion.ctl```. Select the model for the river routing in line 34. Possible options are: (1) UHG routing (daily resolution only, (2) Muskingum and suspended sediment, (3) Muskingum and bedload transport. Choose the sediment model in the reservoir in line 35 among 4 sediment transport equations: (1) [Wu et al. (2000)](#wu-et-al-2000); (2) [Ashida and Michiue (1973)](#ashida-michiue-1973); (3) [Yang (1973,](#yang-1973) [1984)](#yang-1984); (4) [Ackers and White (1973)](#ackers-white-1973).
+The file ```do.dat``` contains the main parameter specifications for the WASA-SED model. By default, it is located in the folder WASA\Input, but any other location may be specified as a command line argument (e.g. ```wasa.exe my_own/do.dat```).  [Figure 1](#figure-1) displays an example. Line order is important; do not add nor delete any lines. The first line of the ```do.dat``` contains the title. Line 2 and 3 specify the path for the location of WASA input and output folder. Relative paths are supported. The backslash “\” only works on Windows-platforms. The slash “/” is accepted on Windows and Unix/Linux systems. Make sure that both specified paths end with slash or backslash, respectively. Line 4 and 5 contain the start and the end year of the simulation, respectively. Line 6 and 7 contain the start and the end calendar month of the simulation, respectively. Optionally, the day of month for begin and end can be specified separated by a blank space. Line 10 contains the number of sub-basins. The number in line 9 is given by the sum of the number of terrain components in each landscape-unit of each sub-basin (e.g. if the system has only two sub-basins, sub-basin A has 1 landscape unit with 3 terrain components, sub-basin B has 2 landscape units with 1 terrain component each, then the number of combinations is 5). Line 14 specifies if the reservoir module is switched on (.t.) or is switched off (.f.). The same issue for the calculations of networks of small reservoirs in line 15. Lines 16 – 19 allow customizing the way water and sediment is (re-)distributed within and among the TCs. Line 21 allows the setting of the simulation timestep (daily / hourly). This may become obsolete in future versions by setting the timestep directly in line 30. Line 24 allows specifying a correction factor for hydraulic conductivity to account for intra-daily rainfall intensities. Optionally, this factor can also be made a function of daily rainfall by specifying two more parameters (a and b) in the same line, so that kfkorr=kfkorr0\*(a\*1/daily_precip+b+1). In line 31 the erosion and sediment-transport routines may be switched on and off. Specify the number of grain size classes you want to model in line 32. Their limits must be specified in ```part_class.dat```, if more than one class is desired. Line 33 lets you choose the hillslope erosion model to be used in WASA. Currently, this parameter is ignored, further options can be chosen in ```erosion.ctl```. Select the model for the river routing in line 34. Possible options are: (1) UHG routing (daily resolution only, (2) Muskingum and suspended sediment, (3) Muskingum and bedload transport. Choose the sediment model in the reservoir in line 35 among 4 sediment transport equations: (1) [Wu et al. (2000)](#wu-et-al-2000); (2) [Ashida and Michiue (1973)](#ashida-michiue-1973); (3) [Yang (1973,](#yang-1973) [1984)](#yang-1984); (4) [Ackers and White (1973)](#ackers-white-1973).
 
 The optional lines 36 and 37 allow the saving/loading of state variables (i.e. groundwater, interception and soil storages) at the end/beginning of a model run (works only if ```svc.dat``` has been specified).
 
@@ -618,7 +620,7 @@ I) Groundwater below soil zone is ignored / not relevant for surface processes |
 I.1) No bedrock is taken into account | Water percolation out of the deepest soil horizon leaves the model domain. | 0	| Select option 1.1.1 or 1.1.2
 I.1.1) Depth of soil zone is the sum of all horizons given in ```soil.dat``` | See 1.1) |	0 |	0	/ meandep=-1, maxdep=-1, riverbed
 I.1.2) Depth of soil zone is meandep (or the total profile depth given in ```soil.dat``` if this is larger than meandep) | See 1.1) |	0 | 0 / Meandep, Maxdep, riverbed
-I.2) Bedrock is taken into account below deepest soil horizon | Hydraulic conductivity of bedrock may affect percolation rates out of the deepest soil horizon. A saturated zone (“groundwater”) above bedrock may consequently evolve due to saturation. Groundwater percolating into the bedrock leaves the model domain. | 0 | Select option 1.2.1 or 1.2.2
+I.2) Bedrock is taken into account below deepest soil horizon | Hydraulic conductivity of bedrock may affect percolation rates out of the deepest soil horizon. A saturated zone (“groundwater”) above bedrock may consequently evolve due to saturation. Groundwater percolating into the bedrock leaves the model domain. | 0 | Select option I.2.1 or I.2.2
 I.2.1) Bedrock is given in ```soil.dat```	| See 1.2) | 0 | 1 / Kfsu, riverbed
 I.2.2) If bedrock is not given in ```soil.dat```, bedrock is assumed to be in the depth defined by meandep (or below deepest horizon given in ```soil.dat``` if its depth is greater than meandep) | See 1.2) |	0 | 0 / Meandep, maxdep, kfsu, riverbed
 
@@ -629,7 +631,7 @@ Modelling options | Groundwater regime, internal representation of processes | G
 ---|---|---|---
 II) Groundwater below soil zone is taken into account | Soil water balance is modelled within the zone above bedrock. Water percolation out of the deepest soil horizon enters linear groundwater storage | 1 | Select option 2.1 or 2.2
 II.1) No bedrock is taken into account | Water percolation out of the deepest soil horizon goes directly into the groundwater storage. | 1 | 0 / meandep=-1, maxdep=-1, frgw_delay, riverbed
-II.2) Bedrock is taken into account below deepest soil horizon | The hydraulic conductivity of the bedrock may affect percolation rates out of the deepest soil horizon. A saturated zone (“groundwater”) above bedrock may consequently evolve due to saturation. Percolation into the bedrock is added to linear groundwater storage. | 1 | Select option 2.2.1 or 2.2.2
+II.2) Bedrock is taken into account below deepest soil horizon | The hydraulic conductivity of the bedrock may affect percolation rates out of the deepest soil horizon. A saturated zone (“groundwater”) above bedrock may consequently evolve due to saturation. Percolation into the bedrock is added to linear groundwater storage. | 1 | Select option II.2.1 or II.2.2
 II.2.1) Bedrock is given in ```soil.dat``` | See 2.2) | 1 | 1 / Kfsu, frgw_delay, riverbed
 II.2.2) If bedrock is not given in soil.dat, bedrock is assumed to be in the depth defined by meandep (or below deepest horizon given in ```soil.dat``` if the profile depth is greater than meandep) | See 2.2) | 1 | 0 / Meandep, maxdep, kfsu, frgw_delay, riverbed
 
@@ -892,7 +894,7 @@ Soil-ID,	Ksat-calib-factor
 *Soil-ID*:	ID of soil<br>
 *Ksat-calib-factor*:	calibration factor 
 
-This file is optional and is in the subdirectory ```Others/```.
+This file is optional and expected in the subdirectory ```Others/```.
 
 Example: All values for saturated hydraulic conductivity of ALL soils (wildcard “-1”) are increased by factor 20. For soil 5, the values are additionally multiplied with 0.3.
 
@@ -914,10 +916,12 @@ transp_cap_b	1.807
 *Erosion equation*:		erosion equation to be used 1: USLE, 2: Onstad-Foster, 3: MUSLE, 4: MUST<br>
 *ri\_05\_coeffs*:	needed for USLE and OF: coefficients for estimation of maximum half-hour rainfall intensity (ri\_05) from daily/hourly rainfall data (R\_dt): ri\_05=a\*R\_dt<sup>b</sup>. <br>
 *transport\_limit\_mode*:		different modes how/if transport capacity of runoff is limited: 1: no transport capacity limit; 2: transport capacity according to Everaert (1991); 3: transport capacity computed from MUSLE with maximum erodibility<br>
-*transp\_cap\_a*:	empirical factor for computing suspended sediment transport capacity in river (a \* vel_peak \*\* b)<br>
-*transp\_cap\_b*:		empirical factor for computing suspended sediment transport capacity in river (a \* vel_peak \*\* b)
+*transp\_cap\_a*:	(only for river routing mode (2)) empirical factor for computing suspended sediment transport capacity in river (a \* vel_peak \*\* b)<br>
+*transp\_cap\_b*:		(only for river routing mode (2)) empirical factor for computing suspended sediment transport capacity in river (a \* vel_peak \*\* b)
 
 This file and any of its entries are optional. If not present, default values are used (Application scale=0; Erosion equation=3, ri\_05\_coeffs = (a\_i30=1.1630; b\_i30=0.667981 for daily resolution;  a\_i30=1; b\_i30=1 for hourly resolution); transport\_limit\_mode=2, transp\_cap\_a=0.016111, transp\_cap\_b=1.707).
+
+This file is optional and expected in the subdirectory ```./```, i.e. usually in the same directory as ```do.dat```.
 
 **14)** ```frac_direct_gw.dat```<br>
 (optional)
@@ -981,8 +985,6 @@ This file contains a single value which will be used as static wind speed value 
 **18)** ```snow_params.ctl```<br>
 (optional)
 
-The two logical parameters do_rad_corr and do_alt_corr allow controlling, whether radiation correction for aspect and slope, and height-depended temperature modifications, respectively, are applied.
-
 ```
 #WASA-control file for snow routines;
 a0	0.002	#empirical coefficient (m/s); linear dependence of turbulent transfer coefficient (D) in sensible heat flux: D = a0 + a1*WindSpeed
@@ -992,7 +994,7 @@ densDrySnow	450	#Density of dry snow (kg/m│)
 specCapRet	0.05	#Capill. retention volume as fraction of solid SWE (-)
 emissivitySnowMin	0.84	#Minimum snow emissivity used for old snow (-)
 emissivitySnowMax	0.99	#Maximum snow emissivity used for new snow (-)
-tempAir_crit	0.2	#Threshold temperature for rain-/snowfall (░C)
+tempAir_crit	0.2	#Threshold temperature for rain-/snowfall (°C)
 albedoMin	0.55	#Minimum albedo used for old snow (-)
 albedoMax	0.88	#Maximum albedo used for new snow (-)
 agingRate_tAirPos	0.00000111	#Aging rate for air temperatures > 0 (1/s)
@@ -1002,24 +1004,33 @@ soilDens	1300	#Density of soil (kg/m3)
 soilSpecHeat	2.18	#Spec. heat capacity of soil (kJ/kg/K)
 weightAirTemp	0.5	#Weighting param. for air temp. (-) in 0...1
 lat	42.4	#Latitude of centre of study area
-lon 0.55	#Longitude of centre of study area
-do_rad_corr .TRUE. #modification of radiation with aspect and slope
-do_alt_corr=.TRUE.   #modification of temperature with altitude of LU
+lon	0.55	#Longitude of centre of study area
+do_rad_corr	.TRUE.	#modification of radiation with aspect and slope
+do_alt_corr	.TRUE.	#modification of temperature with altitude of LU
+tempLaps	-0.006	#Temperature lapse rate for modification depending on elevation of TC (°C/m)
+tempAmplitude	8	#Temperature amplitude to simulate daily cycle (°C])
+tempMaxOffset	2	#Offset of daily temperature maximum from 12:00 (h)
+snowFracThresh	0.02	#Threshold to determine when TC snow covered (m)
 ```
+This file is only necessary when snow is enabled, i.e. ```dosnow=.True.``` set in ```do.dat```
+The two logical parameters ```do_rad_corr``` and ```do_alt_corr``` allow controlling, whether radiation correction for aspect and slope, and height-depended temperature modifications, respectively, are applied.
+Parameters not contained in ```snow_params.ctl``` are set to the default values listed in the example above.
+
 
 **19)** ```lu2.dat```<br>
 (optional)
 
-Required when using the snow module. Hold LU-specific parameters.
-
 ```
 Specification of landscape units, snow parameters		
 LU-ID[id]	aspect[deg]	mean_altitude_over_subbas_mean[m]
-1	104.620873988632	-169.42
-2	-34.3803447238449	-111.23
-3	-123.69006752598	-80.39
-4	-6.84277341263094	-47.46
+1	104.6	-169.4
+2	-34.3	-111.2
+3	-123.6	-80.3
+4	-6.8	-47.4
 ```
+This file is only necessary when snow is enabled, i.e. ```dosnow=.True.``` set in ```do.dat```
+It holds LU-specific parameters: ```aspect``` denotes the mean orientation of the LU in degrees (clockwise from North). It is used for radiation correction, if enabled with ```do_rad_corr```.
+```mean_altitude_over_subbas_mean``` specifies the mean elevation of the LU relative to the subbasin's reference height (usually the subbasins centroid or mean). It is used for radiation correction, if enabled with ```do_alt_corr```.
 
 <a name="3-3-input-files-for-the-river-module"></a>
 ### 3.3 Input files for the river module
@@ -1237,31 +1248,31 @@ Nr. |Parameter File	| Content
 
 ```
 Specification of reservoir parameters
-Subbasin-ID, minlevel[m], maxlevel[m], vol0([1000m**3]; unknown=-999), storcap[1000m**3], damflow[m**3/s], damq_frac[-], withdrawal[m**3/s], damyear[YYYY], maxdamarea[ha], damdead[1000m**3], damalert[1000m**3], dama[-], damb[-], qoutlet[m**3/s], fvol_bottom[-], fvol_over[-], damc[-], damd[-], elevbottom[m]
+Subbasin-ID, minlevel[m], maxlevel[m], vol0([1000m**3]; unknown=-999), storcap[1000m**3], damflow[m**3/s], damq\_frac[-], withdrawal[m**3/s], damyear[YYYY], maxdamarea[ha], damdead[1000m**3], damalert[1000m**3], dama[-], damb[-], qoutlet[m**3/s], fvol_bottom[-], flag_\_over\_delay[-], damc[-], damd[-], elevbottom[m]
 60	413.30	447.67	45213.92	91795.66	36.00	1.00	0.020	1980	718.67	4802.95	45213.92	20.935	0.716	146.84	1.00	0 	300	1.5	430
 ```
 
 *Subbasin-ID*: ID of sub-basin <br>
-*minlevel*: Initial minimum level in the sub-basin’s reservoir \[m]. Value varies because of the sediment accumulation <br>
+*minlevel*: Initial minimum level in the sub-basin’s reservoir \[m]. (Minimum level may change in time because of sediment accumulation). <br>
 *maxlevel*: Maximum water level in the sub-basin’s reservoir \[m] <br>
 *vol0*: Initial volume of the sub-basin’s reservoir \[10³ m³]. If set to ```-999```, 20 % of ```storcap``` is assumed. Value varies because of the sediment accumulation <br>
 *storcap*: Initial storage capacity in the sub-basin’s reservoir \[10³ m³]. Value varies because of the sediment accumulation <br>
-*damflow*: Target release through the barrage’s intake devices of the sub-basin’s reservoir \[m<sup>3</sup>/s]. Contributes to intake in output file ```res_*_watbal.out```. Influenced by damq\_frac and further reduced if the reservoir’s actual storage volume is less than damalert. <br>
-*damq\_frac*: Maximum fraction of damflow which is released from the sub-basin’s reservoir \[-] <br>
-*withdrawal*:	Water withdrawal discharge to supply the water use sectors in the sub-basin’s reservoir \[m<sup>3</sup>/s]. Outflow discharge through the dam is not considered <br>
+*damflow*: Target release through the barrage’s intake devices of the sub-basin’s reservoir \[m<sup>3</sup>/s]. Contributes to intake in output file ```res_*_watbal.out```. Influenced by damq\_frac and further reduced if the reservoir’s actual storage volume is less than damalert. <br> Values of *damflow* may be replaced by measurements when providing the optional input file ```intake.dat``` (see file description).
+*damq\_frac*: Maximum fraction of *damflow* which is released from the sub-basin’s reservoir \[-] <br> If *damq\_frac* is set to -999, this fraction can be specified time variant in ```operat_rule.dat```(see details below).
+*withdrawal*:	Water withdrawal discharge to supply e.g. domestic demand. \[m<sup>3</sup>/s]. This water is not routed back to the river, but leaves the model domain.<br>
 *damyear*: Year of construction of the dam in the sub-basin <br>
 *maxdamarea*: Initial maximum area of the sub-basin’s reservoir \[ha]. Value varies because of the sediment accumulation <br>
-*damdead*: Initial dead volume of the sub-basin’s reservoir \[10<sup>3</sup> m<sup>3</sup>]. Value varies because of the sediment accumulation. Influences actual values of damflow and qoutlet. <br>
-*damalert*: Initial alert volume of the sub-basin’s reservoir \[10<sup>3</sup> m<sup>3</sup>]. Value varies because of the sediment accumulation. Influences damflow. Should be set to volume at the height of the barrage’s intake devices.<br>
+*damdead*: Initial dead volume of the sub-basin’s reservoir \[10<sup>3</sup> m<sup>3</sup>]. Value varies because of the sediment accumulation. Influences actual values of *damflow* and qoutlet. <br>
+*damalert*: Initial alert volume of the sub-basin’s reservoir \[10<sup>3</sup> m<sup>3</sup>]. Value varies because of the sediment accumulation. Influences *damflow*. Should be set to volume at the height of the barrage’s intake devices.<br>
 *dama, damb*:	Parameters of the area-volume relationship in the sub-basin’s reservoir (area=dama.Vol<sup>damb</sup>) \[-]. Values of reservoir area and volume are expressed in m<sup>2</sup> and m<sup>3</sup>, respectively. These are not the Molle parameters, but can be derived thereof: dama = (1/k * (alpha * k)^(alpha/(alpha-1)))^((alpha-1)/alpha); damb = (alpha-1)/alpha (damb should be > 0 and <= 1).<br>
-*qoutlet*:	Maximum outflow discharge released through the bottom outlets in the sub-basin’s reservoir \[m<sup>3</sup>/s]. Contributes to qbottom in output file ```res_*_watbal.out```. Set to zero if less than damdead or less than fvol_bottom\*storcap. <br>
-*fvol\_bottom*: Fraction of storage capacity that indicates the minimum storage volume for sediment release through the bottom outlets of the sub-basin's reservoir \[-]. Influences the actual value of qoutlet. <br>
-*fvol\_over*: flag to simulate the retention of reservoir overflow during spillway operation \[0 = without time delay; 1 = with time delay] <br>
+*qoutlet*:	Maximum outflow discharge released through the bottom outlets in the sub-basin’s reservoir \[m<sup>3</sup>/s]. Contributes to qbottom in output file ```res_*_watbal.out```. Set to zero if less than *damdead* or less than fvol_bottom\*storcap. <br>
+*fvol\_bottom*: Fraction of storage capacity that indicates the minimum storage volume for sediment release through the bottom outlets of the sub-basin's reservoir \[-]. Influences the actual value of qoutlet. <br> If the value of *fvol_bottom* set to -999, an additional file ```operat_bottom.dat``` must be provided with detailed information about the sediment management technique selected for routing sediment through the sub-basin’s reservoir (see details below). <br>
+*flag\_over\_delay*: flag to simulate the retention of reservoir overflow during spillway operation \[0 = without time delay; 1 = with time delay] <br>
 *damc, damd*: Parameters of the spillway rating curve in the sub-basin’s reservoir (Qout=damc.Hv<sup>damd</sup>) \[-]. Values of water height over the spillway (Hv) and overflow discharge (Qout) are expressed in m and m<sup>3</sup>/s, respectively <br>
 *elevbottom*: bottom outlet elevation of the sub-basin's reservoir \[m]. Currently not used, fill in dummy values.
 
 
-Example: At the outlet point of the sub-basin with the ID 60, there is a reservoir with an initial minimum level of 413.30 m, a maximum water level of 447.67 m, an initial volume of 45,213,920 m³, an initial storage capacity of 91,795,660 m³, a target outflow discharge of 36 m³/s, a water withdrawal discharge to supply the water use sectors of 20 L/s, year of construction in 1980, an initial maximum area of 718.67 ha, an initial dead volume of 4,802,950 m³, an initial alert volume of 45,213,920 m³, an area-volume relationship with parameters dama and damb set to 20.935 and 0.716, respectively, an maximum outflow discharge through the bottom outlets of 146.84 m³, a percentage of storage capacity for the operation of bottom outlets of 100 % and a percentage of storage capacity for overflow discharge through radial gates of 80 %, a spillway rating curve with parameters damc and damd set to 300 and 1.5, respectively. Value of vol0 set to -999 means that at the beginning of the simulation period the water volume is 20 % of the storage capacity ([Güntner, 2002](#guentner-2002)). Value of damq_frac set to -999 means that the reservoir operation rule is affected by irrigation season. Thus, an additional file has to be provided, which gives the interannual variability of exploitation regime (see below the file ```operat_rule.dat```). Values of damflow may be replaced by measurements when providing the optional input file ```intake.dat``` (see file description). Value of fvol_bottom set to -999 means that an additional file must be provided with detailed information about the sediment management technique selected to routing sediment through the sub-basin’s reservoir (see below the file ```operat_bottom.dat```). The order of the sub-basins in the first column has to follow the same order of the sub-basin IDs as was used in ```hymo.dat``` (due to computational reasons); otherwise, an error message occurs. Sub-basins without outlet reservoirs must not be entered in the file.
+Example: At the outlet point of the sub-basin with the ID 60, there is a reservoir with an initial minimum level of 413.30 m, a maximum water level of 447.67 m, an initial volume of 45,213,920 m³, an initial storage capacity of 91,795,660 m³, a target outflow discharge of 36 m³/s, a water withdrawal discharge to supply domestic demand of 20 L/s, year of construction in 1980, an initial maximum area of 718.67 ha, an initial dead volume of 4,802,950 m³, an initial alert volume of 45,213,920 m³, an area-volume relationship with parameters *dama* and *damb* set to 20.935 and 0.716, respectively, an maximum outflow discharge through the bottom outlets of 146.84 m³, a percentage of 100 % of storage capacity for the bottom outlets to start operating, a spillway rating curve with parameters *damc* and *damd* set to 300 and 1.5, respectively. The elevation of the bottom outlet is at 430 m.  
 
 **2)** ```lateral_inflow.dat```
 (optional)
@@ -1447,7 +1458,10 @@ Subbasin-ID, nbr. cross sec, 1st row: pt1 [-], 2nd row: pt2 [-]
 
 Example: This optional file allows specifying the exact location of main channel in the cross sections of the sub-basin’s reservoir. This information is used to adjust bed profiles of cross sections, avoiding steeper slopes caused by erosion processes. If this file is not found in the folder reservoir, there are two possibilities: sediment routing through the sub-basin’s reservoir is computed anyway, disregarding the occurrence of steeper slopes; or a simplified modelling approach for the calculation of sediment balance is assumed (if the file ```cross_sec_”ID”.dat``` is not given). The reservoir located at the outlet point of the sub-basin with the ID 60 has 53 cross sections. The main channel of cross section 1 is located between the 8th and 15th points (cross section 2: located between the 10th and 17th points; etc). A value of -999 indicates unknown location of main channel for that cross section. Sub-basins without outlet reservoirs or those without data on location of main channel of cross sections must not be entered in the file.
 
-**13)** ```lake.dat```
+The following files contain the substring "lake", which indicates their association to the small, unlocated / distributed reservoirs (opposed to the located, strategic reservoirs covered before).
+
+**13)** ```lake.dat``` <br>
+(required, if doacudes=.TRUE.:)
 
 ```
 # Specification of parameters for the reservoir size classes
@@ -1506,6 +1520,7 @@ Year, sub-basin-ID, acudfloatyear[-] (five reservoir size classes)
 Example: This optional file allows specifying changes on the number of reservoirs in the size classes. If this file is not found in the folder reservoir, a yearly variation in the number of reservoirs for sub-basins and size classes given in the file ```lake.dat``` is assumed. In the year 2005, the sub-basin with the ID 15 has 32 reservoirs of class 1, 34 of class 2, 17 of class 3, 20 of class 4, and 11 of class 5. The order of the sub-basins in the second column has to follow the same order of the sub-basin IDs for all years of simulation as was used in ```hymo.dat``` (due to computational reasons); otherwise, an error message occurs. Sub-basins without networks of small reservoirs must not be entered in the file.
 
 **16)** ```lake_number.dat```
+(required, if doacudes=.TRUE.:)
 
 ```
 # Specification of total number of reservoirs in the size classes
